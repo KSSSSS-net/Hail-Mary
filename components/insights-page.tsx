@@ -253,12 +253,6 @@ export function InsightsPage() {
                   strokeWidth={2}
                   fill="url(#colorAmount)" 
                   className="transition-all duration-300 ease-out"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
                   dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
                 />
