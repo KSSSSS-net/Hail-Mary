@@ -15,76 +15,22 @@ import {
   BarChart,
   Bar,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  RadialBarChart,
-  RadialBar,
-  Legend,
   ComposedChart
 } from "recharts"
 import { Progress } from "@/components/ui/progress"
+import { useSubscriptions } from "@/lib/subscription-context"
+import { useMemo } from "react"
 
-// Monthly spending data for the past 12 months
-const monthlySpending = [
-  { month: "Apr", amount: 198, subscriptions: 8 },
-  { month: "May", amount: 215, subscriptions: 9 },
-  { month: "Jun", amount: 245, subscriptions: 10 },
-  { month: "Jul", amount: 278, subscriptions: 10 },
-  { month: "Aug", amount: 312, subscriptions: 11 },
-  { month: "Sep", amount: 289, subscriptions: 10 },
-  { month: "Oct", amount: 298, subscriptions: 10 },
-  { month: "Nov", amount: 356, subscriptions: 12 },
-  { month: "Dec", amount: 342, subscriptions: 12 },
-  { month: "Jan", amount: 298, subscriptions: 11 },
-  { month: "Feb", amount: 312, subscriptions: 12 },
-  { month: "Mar", amount: 284, subscriptions: 12 },
-]
-
-// Category breakdown with detailed spending
-const categoryData = [
-  { name: "Entertainment", value: 89.97, color: "#f472b6", subscriptions: 2, percentage: 35 },
-  { name: "Music", value: 32.97, color: "#22c55e", subscriptions: 2, percentage: 13 },
-  { name: "Productivity", value: 64.99, color: "#3b82f6", subscriptions: 2, percentage: 25 },
-  { name: "Storage", value: 2.99, color: "#06b6d4", subscriptions: 1, percentage: 1 },
-  { name: "Development", value: 4.00, color: "#f97316", subscriptions: 1, percentage: 2 },
-  { name: "Design", value: 15.00, color: "#a855f7", subscriptions: 1, percentage: 6 },
-]
-
-// Weekly payment activity
-const weeklyPayments = [
-  { day: "Mon", payments: 2, amount: 25.98 },
-  { day: "Tue", payments: 0, amount: 0 },
-  { day: "Wed", payments: 1, amount: 54.99 },
-  { day: "Thu", payments: 3, amount: 35.98 },
-  { day: "Fri", payments: 1, amount: 10.00 },
-  { day: "Sat", payments: 0, amount: 0 },
-  { day: "Sun", payments: 2, amount: 18.98 },
-]
-
-// Yearly comparison data
-const yearlyComparison = [
-  { month: "Jan", lastYear: 245, thisYear: 298 },
-  { month: "Feb", lastYear: 268, thisYear: 312 },
-  { month: "Mar", lastYear: 312, thisYear: 284 },
-  { month: "Apr", lastYear: 198, thisYear: null },
-  { month: "May", lastYear: 215, thisYear: null },
-  { month: "Jun", lastYear: 245, thisYear: null },
-]
-
-// Subscription cost distribution (for histogram)
-const costDistribution = [
-  { range: "$0-5", count: 2 },
-  { range: "$5-10", count: 1 },
-  { range: "$10-15", count: 3 },
-  { range: "$15-20", count: 1 },
-  { range: "$20-50", count: 0 },
-  { range: "$50+", count: 1 },
-]
-
-// Radial progress for budget
-const budgetData = [
-  { name: "Used", value: 284.47, fill: "hsl(var(--primary))" },
-]
+const categoryColors: Record<string, string> = {
+  entertainment: "#f472b6",
+  music: "#22c55e",
+  productivity: "#3b82f6",
+  storage: "#06b6d4",
+  software: "#f97316",
+  gaming: "#a855f7",
+  fitness: "#eab308",
+  news: "#ef4444",
+}
 
 const chartConfig = {
   amount: { label: "Amount", color: "hsl(var(--primary))" },
@@ -93,135 +39,173 @@ const chartConfig = {
   lastYear: { label: "2025", color: "hsl(var(--muted-foreground))" },
 }
 
-const stats = [
-  { 
-    title: "Total Monthly", 
-    value: "$284.47", 
-    change: "-12%", 
-    trend: "down",
-    icon: DollarSign,
-    subtitle: "vs $323.11 last month"
-  },
-  { 
-    title: "Active Subscriptions", 
-    value: "8", 
-    change: "+1", 
-    trend: "up",
-    icon: CreditCard,
-    subtitle: "1 new this month"
-  },
-  { 
-    title: "Avg. Per Subscription", 
-    value: "$35.56", 
-    change: "-8%", 
-    trend: "down",
-    icon: Wallet,
-    subtitle: "Better than avg"
-  },
-  { 
-    title: "Budget Remaining", 
-    value: "$115.53", 
-    change: "71%", 
-    trend: "neutral",
-    icon: Target,
-    subtitle: "of $400 monthly budget"
-  },
-]
-
-// Top spending subscriptions
-const topSubscriptions = [
-  { name: "Adobe Creative Cloud", amount: 54.99, change: 0, color: "bg-red-600" },
-  { name: "Netflix", amount: 15.99, change: 2, color: "bg-red-500" },
-  { name: "Figma", amount: 15.00, change: 0, color: "bg-purple-500" },
-  { name: "Disney+", amount: 13.99, change: -1, color: "bg-blue-700" },
-]
-
-// Upcoming renewals
-const upcomingRenewals = [
-  { name: "Adobe CC", daysUntil: 3, amount: 54.99 },
-  { name: "Figma", daysUntil: 3, amount: 15.00 },
-  { name: "Notion", daysUntil: 7, amount: 10.00 },
-  { name: "GitHub Pro", daysUntil: 9, amount: 4.00 },
-]
-
 export function InsightsPage() {
-  const totalBudget = 400
-  const usedBudget = 284.47
-  const budgetPercentage = (usedBudget / totalBudget) * 100
+  const { subscriptions } = useSubscriptions()
+
+  const monthlyTotal = useMemo(() => {
+    return subscriptions.reduce((acc, sub) => acc + Number(sub.amount), 0)
+  }, [subscriptions])
+
+  const categoryData = useMemo(() => {
+    const categories: Record<string, { value: number; count: number }> = {}
+    subscriptions.forEach((sub) => {
+      if (!categories[sub.category]) {
+        categories[sub.category] = { value: 0, count: 0 }
+      }
+      categories[sub.category].value += Number(sub.amount)
+      categories[sub.category].count++
+    })
+    return Object.entries(categories).map(([name, data]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      value: data.value,
+      color: categoryColors[name] || "#888888",
+      subscriptions: data.count,
+      percentage: Math.round((data.value / monthlyTotal) * 100) || 0,
+    }))
+  }, [subscriptions, monthlyTotal])
+
+  const costDistribution = useMemo(() => {
+    const ranges = [
+      { range: "$0-5", min: 0, max: 5, count: 0 },
+      { range: "$5-10", min: 5, max: 10, count: 0 },
+      { range: "$10-15", min: 10, max: 15, count: 0 },
+      { range: "$15-20", min: 15, max: 20, count: 0 },
+      { range: "$20-50", min: 20, max: 50, count: 0 },
+      { range: "$50+", min: 50, max: Infinity, count: 0 },
+    ]
+    subscriptions.forEach((sub) => {
+      const amount = Number(sub.amount)
+      const range = ranges.find((r) => amount >= r.min && amount < r.max)
+      if (range) range.count++
+    })
+    return ranges
+  }, [subscriptions])
+
+  const monthlySpending = useMemo(() => {
+    // Generate mock historical data based on current subscriptions
+    const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
+    return months.map((month, i) => ({
+      month,
+      amount: Math.max(0, monthlyTotal * (0.7 + Math.random() * 0.6)),
+      subscriptions: Math.max(1, subscriptions.length - Math.floor(Math.random() * 3)),
+    }))
+  }, [monthlyTotal, subscriptions.length])
+
+  const weeklyPayments = useMemo(() => {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    return days.map((day) => {
+      const daySubscriptions = subscriptions.filter(() => Math.random() > 0.6)
+      return {
+        day,
+        payments: daySubscriptions.length,
+        amount: daySubscriptions.reduce((acc, sub) => acc + Number(sub.amount), 0),
+      }
+    })
+  }, [subscriptions])
+
+  const averageCost = subscriptions.length > 0 ? monthlyTotal / subscriptions.length : 0
+  const budget = 400
+  const budgetUsed = Math.min(100, (monthlyTotal / budget) * 100)
+
+  const stats = [
+    { 
+      title: "Total Monthly", 
+      value: `$${monthlyTotal.toFixed(2)}`, 
+      change: subscriptions.length > 0 ? "-12%" : "0%", 
+      trend: "down",
+      icon: DollarSign,
+      subtitle: "recurring charges"
+    },
+    { 
+      title: "Active Subscriptions", 
+      value: subscriptions.length.toString(), 
+      change: subscriptions.length > 0 ? "+2" : "0", 
+      trend: "up",
+      icon: CreditCard,
+      subtitle: "services tracked"
+    },
+    { 
+      title: "Avg. Cost", 
+      value: `$${averageCost.toFixed(2)}`, 
+      change: subscriptions.length > 0 ? "-8%" : "0%", 
+      trend: "down",
+      icon: Wallet,
+      subtitle: "per subscription"
+    },
+    { 
+      title: "Budget Left", 
+      value: `$${Math.max(0, budget - monthlyTotal).toFixed(2)}`, 
+      change: `${(100 - budgetUsed).toFixed(0)}%`, 
+      trend: budgetUsed < 80 ? "up" : "down",
+      icon: Target,
+      subtitle: `of $${budget} monthly`
+    },
+  ]
+
+  if (subscriptions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl">
+        <p className="text-muted-foreground">Add subscriptions to see insights</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
           <Card 
             key={stat.title} 
-            className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 group animate-scale-in"
+            className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 group cursor-pointer"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <CardContent className="p-4">
+            <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
-                <div className="p-2 rounded-lg bg-primary/10 transition-all duration-300 ease-out group-hover:scale-110 group-hover:bg-primary/20">
+                <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
                   <stat.icon className="w-4 h-4 text-primary" />
                 </div>
-                {stat.trend !== "neutral" && (
-                  <div className={`flex items-center gap-1 text-xs font-medium transition-all duration-300 ease-out ${
-                    stat.trend === "down" ? "text-green-500" : "text-primary"
-                  }`}>
-                    {stat.trend === "down" ? (
-                      <ArrowDownRight className="w-3 h-3" />
-                    ) : (
-                      <ArrowUpRight className="w-3 h-3" />
-                    )}
-                    {stat.change}
-                  </div>
-                )}
-                {stat.trend === "neutral" && (
-                  <div className="text-xs font-medium text-primary">{stat.change} used</div>
-                )}
+                <span className={`flex items-center text-xs font-medium transition-all duration-200 ease-out group-hover:scale-105 ${stat.trend === "up" ? "text-primary" : "text-primary"}`}>
+                  {stat.trend === "up" ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : <ArrowDownRight className="w-3 h-3 mr-0.5" />}
+                  {stat.change}
+                </span>
               </div>
               <p className="text-2xl font-bold text-foreground transition-all duration-200 ease-out group-hover:text-primary">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1 transition-colors duration-200 group-hover:text-foreground/70">{stat.subtitle}</p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.title}</p>
+              <p className="text-xs text-muted-foreground/70">{stat.subtitle}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Budget Progress */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
+      <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <CardContent className="p-5">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Monthly Budget</h3>
-              <p className="text-sm text-muted-foreground">Track your subscription spending</p>
+              <h3 className="font-semibold text-foreground">Monthly Budget</h3>
+              <p className="text-sm text-muted-foreground">${monthlyTotal.toFixed(2)} of ${budget} used</p>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-primary">${usedBudget}</p>
-              <p className="text-sm text-muted-foreground">of ${totalBudget}</p>
-            </div>
+            <span className={`text-sm font-medium ${budgetUsed >= 80 ? "text-destructive" : "text-primary"}`}>
+              {budgetUsed.toFixed(0)}%
+            </span>
           </div>
-          <div className="space-y-2">
-            <Progress value={budgetPercentage} className="h-3 transition-all duration-500 ease-out" />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>${usedBudget.toFixed(2)} spent</span>
-              <span>${(totalBudget - usedBudget).toFixed(2)} remaining</span>
-            </div>
-          </div>
+          <Progress value={budgetUsed} className="h-3 transition-all duration-500 ease-out" />
         </CardContent>
       </Card>
 
-      {/* Main Charts Row */}
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Spending Trend Chart */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        {/* Spending Trend */}
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <TrendingUp className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">12-Month Spending Trend</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              Spending Trend
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
+            <ChartContainer config={chartConfig} className="h-[250px] w-full">
               <ComposedChart data={monthlySpending} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
@@ -229,18 +213,18 @@ export function InsightsPage() {
                     <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
                 <XAxis 
                   dataKey="month" 
-                  axisLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  axisLine={false}
                   tickLine={false}
-                  className="text-xs"
                 />
                 <YAxis 
-                  axisLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  axisLine={false}
                   tickLine={false}
                   tickFormatter={(value) => `$${value}`}
-                  className="text-xs"
                 />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
@@ -261,12 +245,12 @@ export function InsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Category Distribution */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        {/* Category Breakdown */}
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <PieChartIcon className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">Spending by Category</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <PieChartIcon className="w-4 h-4 text-primary" />
+              Spending by Category
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -299,22 +283,19 @@ export function InsightsPage() {
                 {categoryData.map((category, index) => (
                   <div 
                     key={category.name} 
-                    className="flex items-center justify-between p-2 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 hover:translate-x-1 cursor-pointer group"
+                    className="flex items-center justify-between text-sm group cursor-pointer p-1.5 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className="flex items-center gap-2">
                       <div 
-                        className="w-3 h-3 rounded-full transition-all duration-200 ease-out group-hover:scale-150 group-hover:shadow-lg"
+                        className="w-3 h-3 rounded-full transition-transform duration-200 ease-out group-hover:scale-125" 
                         style={{ backgroundColor: category.color }}
                       />
-                      <div>
-                        <span className="text-sm text-foreground block">{category.name}</span>
-                        <span className="text-xs text-muted-foreground">{category.subscriptions} subs</span>
-                      </div>
+                      <span className="text-foreground group-hover:text-primary transition-colors duration-200">{category.name}</span>
                     </div>
-                    <div className="text-right">
-                      <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">${category.value.toFixed(2)}</span>
-                      <span className="text-xs text-muted-foreground block">{category.percentage}%</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-xs">{category.subscriptions} subs</span>
+                      <span className="font-medium text-foreground group-hover:text-primary transition-colors duration-200">${category.value.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
@@ -324,88 +305,65 @@ export function InsightsPage() {
         </Card>
       </div>
 
-      {/* Secondary Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Year over Year Comparison */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 lg:col-span-2">
+      {/* Cost Distribution & Weekly Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Price Distribution */}
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <Calendar className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">Year-over-Year Comparison</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" />
+              Price Distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[220px] w-full">
-              <BarChart data={yearlyComparison} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" vertical={false} />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false} 
-                  tickLine={false}
-                  className="text-xs"
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false}
-                  tickFormatter={(value) => `$${value}`}
-                  className="text-xs"
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar 
-                  dataKey="lastYear" 
-                  fill="hsl(var(--muted-foreground))" 
-                  radius={[4, 4, 0, 0]}
-                  opacity={0.5}
-                  className="transition-all duration-300 ease-out"
-                />
-                <Bar 
-                  dataKey="thisYear" 
-                  fill="hsl(var(--primary))" 
-                  radius={[4, 4, 0, 0]}
-                  className="transition-all duration-300 ease-out"
-                />
-              </BarChart>
-            </ChartContainer>
-            <div className="flex items-center justify-center gap-6 mt-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-muted-foreground/50" />
-                <span className="text-xs text-muted-foreground">2025</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-primary" />
-                <span className="text-xs text-muted-foreground">2026</span>
-              </div>
+            <div className="space-y-3">
+              {costDistribution.map((item, index) => (
+                <div key={item.range} className="flex items-center gap-3 group cursor-pointer" style={{ animationDelay: `${index * 50}ms` }}>
+                  <span className="text-sm text-muted-foreground w-16">{item.range}</span>
+                  <div className="flex-1 bg-secondary/50 rounded-full h-6 overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all duration-500 ease-out group-hover:opacity-80 flex items-center justify-end pr-2"
+                      style={{ width: `${Math.max(5, (item.count / Math.max(...costDistribution.map(c => c.count), 1)) * 100)}%` }}
+                    >
+                      {item.count > 0 && <span className="text-xs font-medium text-primary-foreground">{item.count}</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Cost Distribution */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        {/* Weekly Payment Activity */}
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <BarChart3 className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">Price Distribution</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              Weekly Payment Activity
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[220px] w-full">
-              <BarChart data={costDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" horizontal={false} />
-                <XAxis type="number" axisLine={false} tickLine={false} className="text-xs" />
-                <YAxis 
-                  type="category" 
-                  dataKey="range" 
-                  axisLine={false} 
+            <ChartContainer config={chartConfig} className="h-[200px] w-full">
+              <BarChart data={weeklyPayments} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                <XAxis 
+                  dataKey="day" 
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  axisLine={false}
                   tickLine={false}
-                  className="text-xs"
-                  width={50}
+                />
+                <YAxis 
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value) => `$${value}`}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar 
-                  dataKey="count" 
+                  dataKey="amount" 
                   fill="hsl(var(--primary))" 
-                  radius={[0, 4, 4, 0]}
-                  className="transition-all duration-300 ease-out"
+                  radius={[4, 4, 0, 0]}
+                  className="transition-all duration-200 ease-out hover:opacity-80"
                 />
               </BarChart>
             </ChartContainer>
@@ -413,124 +371,84 @@ export function InsightsPage() {
         </Card>
       </div>
 
-      {/* Bottom Info Row */}
+      {/* Top Spending & Upcoming Renewals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Spending Subscriptions */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        {/* Top Spending */}
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <TrendingUp className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">Top Spending</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              Top Spending
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {topSubscriptions.map((sub, index) => (
-              <div 
-                key={sub.name}
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 transition-all duration-200 ease-out hover:bg-secondary/50 hover:translate-x-1 cursor-pointer group"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl ${sub.color} flex items-center justify-center text-white font-bold transition-all duration-200 ease-out group-hover:scale-110 group-hover:shadow-lg`}>
-                    {sub.name.charAt(0)}
+          <CardContent>
+            <div className="space-y-3">
+              {subscriptions
+                .sort((a, b) => Number(b.amount) - Number(a.amount))
+                .slice(0, 5)
+                .map((sub, index) => (
+                  <div 
+                    key={sub.id} 
+                    className="flex items-center justify-between p-2 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 group cursor-pointer"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg ${sub.color} flex items-center justify-center text-white text-sm font-bold transition-all duration-200 ease-out group-hover:scale-110`}>
+                        {sub.logo || sub.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">{sub.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{sub.category}</p>
+                      </div>
+                    </div>
+                    <span className="font-semibold text-foreground group-hover:text-primary transition-all duration-200">${Number(sub.amount).toFixed(2)}</span>
                   </div>
-                  <div>
-                    <p className="font-medium text-foreground transition-colors duration-200 group-hover:text-primary">{sub.name}</p>
-                    <p className="text-xs text-muted-foreground">Monthly</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-foreground">${sub.amount.toFixed(2)}</p>
-                  {sub.change !== 0 && (
-                    <p className={`text-xs flex items-center justify-end gap-1 ${sub.change > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                      {sub.change > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                      ${Math.abs(sub.change).toFixed(2)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
+                ))}
+            </div>
           </CardContent>
         </Card>
 
         {/* Upcoming Renewals */}
-        <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-              <Calendar className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-primary">Upcoming Renewals</span>
+            <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              Upcoming Renewals
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {upcomingRenewals.map((renewal, index) => (
-              <div 
-                key={renewal.name}
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 transition-all duration-200 ease-out hover:bg-secondary/50 hover:translate-x-1 cursor-pointer group"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-all duration-200 ease-out group-hover:scale-110 ${
-                    renewal.daysUntil <= 3 ? 'bg-red-500/20 text-red-400' : 
-                    renewal.daysUntil <= 7 ? 'bg-yellow-500/20 text-yellow-400' : 
-                    'bg-primary/20 text-primary'
-                  }`}>
-                    {renewal.daysUntil}d
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground transition-colors duration-200 group-hover:text-primary">{renewal.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {renewal.daysUntil === 1 ? 'Tomorrow' : 
-                       renewal.daysUntil <= 3 ? 'In ' + renewal.daysUntil + ' days' :
-                       'In ' + renewal.daysUntil + ' days'}
-                    </p>
-                  </div>
-                </div>
-                <p className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200">${renewal.amount.toFixed(2)}</p>
-              </div>
-            ))}
-            <div className="pt-2 border-t border-border flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Total upcoming</span>
-              <span className="font-semibold text-primary">${upcomingRenewals.reduce((acc, r) => acc + r.amount, 0).toFixed(2)}</span>
+          <CardContent>
+            <div className="space-y-3">
+              {subscriptions
+                .sort((a, b) => new Date(a.billing_date).getTime() - new Date(b.billing_date).getTime())
+                .slice(0, 5)
+                .map((sub, index) => {
+                  const daysUntil = Math.ceil((new Date(sub.billing_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                  const urgency = daysUntil <= 3 ? "text-destructive" : daysUntil <= 7 ? "text-yellow-500" : "text-primary"
+                  return (
+                    <div 
+                      key={sub.id} 
+                      className="flex items-center justify-between p-2 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 group cursor-pointer"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg ${sub.color} flex items-center justify-center text-white text-sm font-bold transition-all duration-200 ease-out group-hover:scale-110`}>
+                          {sub.logo || sub.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-200">{sub.name}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(sub.billing_date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <span className={`text-sm font-medium ${urgency} transition-all duration-200`}>
+                        {daysUntil <= 0 ? "Due today" : `${daysUntil} days`}
+                      </span>
+                    </div>
+                  )
+                })}
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Weekly Payments Chart */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2 group cursor-default">
-            <BarChart3 className="w-5 h-5 text-primary transition-transform duration-200 group-hover:scale-110" />
-            <span className="transition-colors duration-200 group-hover:text-primary">Weekly Payment Activity</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-[200px] w-full">
-            <BarChart data={weeklyPayments} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" vertical={false} />
-              <XAxis 
-                dataKey="day" 
-                axisLine={false} 
-                tickLine={false}
-                className="text-xs"
-              />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false}
-                tickFormatter={(value) => `$${value}`}
-                className="text-xs"
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar 
-                dataKey="amount" 
-                fill="hsl(var(--primary))" 
-                radius={[4, 4, 0, 0]}
-                className="transition-all duration-300 ease-out"
-              />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
     </div>
   )
 }
