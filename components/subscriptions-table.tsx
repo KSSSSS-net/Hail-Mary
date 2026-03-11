@@ -59,6 +59,7 @@ export function SubscriptionsTable() {
               <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Date of Purchase</TableHead>
               <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Upcoming Payment</TableHead>
               <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Amount</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Frequency</TableHead>
               <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Category</TableHead>
               <TableHead className="text-muted-foreground font-medium w-[50px]"></TableHead>
             </TableRow>
@@ -81,6 +82,11 @@ export function SubscriptionsTable() {
                 <TableCell className="text-muted-foreground transition-colors duration-200 ease-out group-hover:text-foreground">{formatDate(sub.purchase_date)}</TableCell>
                 <TableCell className="text-foreground font-medium">{formatDate(sub.billing_date)}</TableCell>
                 <TableCell className="font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105 origin-left">₹{Number(sub.amount).toFixed(2)}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="border-primary/30 text-primary font-medium transition-all duration-200 ease-out hover:scale-105 capitalize">
+                    {sub.billing_frequency || "monthly"}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <Badge variant="secondary" className={`${categoryColors[sub.category] || "bg-gray-500/20 text-gray-400"} border-0 font-medium transition-all duration-200 ease-out hover:scale-105 capitalize`}>
                     {sub.category}

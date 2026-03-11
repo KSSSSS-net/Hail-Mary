@@ -4,6 +4,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 
+export type BillingFrequency = 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+
 export interface Subscription {
   id: string
   user_id: string
@@ -12,6 +14,7 @@ export interface Subscription {
   category: string
   billing_date: string
   purchase_date: string
+  billing_frequency: BillingFrequency
   logo: string | null
   color: string
 }

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field"
-import { useSubscriptions } from "@/lib/subscription-context"
+import { useSubscriptions, type BillingFrequency } from "@/lib/subscription-context"
 import { Loader2 } from "lucide-react"
 
 interface AddSubscriptionDialogProps {
@@ -29,6 +29,7 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
   const [name, setName] = useState("")
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
+  const [billingFrequency, setBillingFrequency] = useState<BillingFrequency>("monthly")
   const [billingDate, setBillingDate] = useState("")
   const [loading, setLoading] = useState(false)
   const { addSubscription } = useSubscriptions()
@@ -42,6 +43,7 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
         name,
         amount: parseFloat(amount),
         category,
+        billing_frequency: billingFrequency,
         billing_date: billingDate,
         purchase_date: new Date().toISOString().split("T")[0],
         logo: name.charAt(0).toUpperCase(),
@@ -52,6 +54,7 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
       setName("")
       setAmount("")
       setCategory("")
+      setBillingFrequency("monthly")
       setBillingDate("")
     } finally {
       setLoading(false)
@@ -81,7 +84,7 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
           </Field>
           
           <Field>
-            <FieldLabel htmlFor="amount" className="text-foreground">Monthly Amount</FieldLabel>
+            <FieldLabel htmlFor="amount" className="text-foreground">Amount (₹)</FieldLabel>
             <Input
               id="amount"
               type="number"
@@ -92,6 +95,21 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
               onChange={(e) => setAmount(e.target.value)}
               className="bg-secondary/50 border-border focus:border-primary transition-all duration-200"
             />
+          </Field>
+          
+          <Field>
+            <FieldLabel htmlFor="billing-frequency" className="text-foreground">Billing Frequency</FieldLabel>
+            <Select value={billingFrequency} onValueChange={(value) => setBillingFrequency(value as BillingFrequency)}>
+              <SelectTrigger className="bg-secondary/50 border-border focus:border-primary transition-all duration-200">
+                <SelectValue placeholder="Select frequency" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="quarterly">Quarterly (Every 3 months)</SelectItem>
+                <SelectItem value="yearly">Yearly</SelectItem>
+              </SelectContent>
+            </Select>
           </Field>
           
           <Field>
