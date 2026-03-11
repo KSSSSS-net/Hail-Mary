@@ -1,12 +1,9 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react"
-import { createClient } from "@/lib/supabase/client"
-import type { User } from "@supabase/supabase-js"
+import { createContext, useContext, useState, type ReactNode } from "react"
 
 export interface Subscription {
   id: string
-  user_id: string
   name: string
   amount: number
   category: string
@@ -14,97 +11,102 @@ export interface Subscription {
   purchase_date: string
   logo: string | null
   color: string
-  created_at: string
-  updated_at: string
 }
 
 interface SubscriptionContextType {
   subscriptions: Subscription[]
   loading: boolean
-  user: User | null
-  addSubscription: (subscription: Omit<Subscription, "id" | "user_id" | "created_at" | "updated_at">) => Promise<void>
-  updateSubscription: (id: string, subscription: Partial<Subscription>) => Promise<void>
-  deleteSubscription: (id: string) => Promise<void>
-  refreshSubscriptions: () => Promise<void>
+  addSubscription: (subscription: Omit<Subscription, "id">) => void
+  updateSubscription: (id: string, subscription: Partial<Subscription>) => void
+  deleteSubscription: (id: string) => void
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined)
 
+// Sample subscriptions for demo
+const sampleSubscriptions: Subscription[] = [
+  {
+    id: "1",
+    name: "Netflix",
+    amount: 15.99,
+    category: "Entertainment",
+    billing_date: "2026-03-15",
+    purchase_date: "2024-01-10",
+    logo: "N",
+    color: "bg-red-600",
+  },
+  {
+    id: "2",
+    name: "Spotify",
+    amount: 9.99,
+    category: "Music",
+    billing_date: "2026-03-20",
+    purchase_date: "2023-06-15",
+    logo: "S",
+    color: "bg-green-600",
+  },
+  {
+    id: "3",
+    name: "Adobe CC",
+    amount: 54.99,
+    category: "Productivity",
+    billing_date: "2026-03-25",
+    purchase_date: "2024-02-01",
+    logo: "Ai",
+    color: "bg-orange-600",
+  },
+  {
+    id: "4",
+    name: "iCloud",
+    amount: 2.99,
+    category: "Storage",
+    billing_date: "2026-03-18",
+    purchase_date: "2022-11-20",
+    logo: "iC",
+    color: "bg-blue-500",
+  },
+  {
+    id: "5",
+    name: "YouTube Premium",
+    amount: 13.99,
+    category: "Entertainment",
+    billing_date: "2026-03-22",
+    purchase_date: "2024-03-05",
+    logo: "YT",
+    color: "bg-red-500",
+  },
+  {
+    id: "6",
+    name: "ChatGPT Plus",
+    amount: 20.00,
+    category: "AI Tools",
+    billing_date: "2026-03-28",
+    purchase_date: "2024-05-10",
+    logo: "GP",
+    color: "bg-emerald-600",
+  },
+]
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
-  const supabase = createClient()
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>(sampleSubscriptions)
+  const [loading] = useState(false)
 
-  const fetchSubscriptions = useCallback(async () => {
-    setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-
-    if (user) {
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .order("billing_date", { ascending: true })
-
-      if (!error && data) {
-        setSubscriptions(data)
-      }
+  const addSubscription = (subscription: Omit<Subscription, "id">) => {
+    const newSubscription: Subscription = {
+      ...subscription,
+      id: crypto.randomUUID(),
     }
-    setLoading(false)
-  }, [supabase])
-
-  useEffect(() => {
-    fetchSubscriptions()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        fetchSubscriptions()
-      } else if (event === "SIGNED_OUT") {
-        setSubscriptions([])
-        setUser(null)
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [fetchSubscriptions, supabase.auth])
-
-  const addSubscription = async (subscription: Omit<Subscription, "id" | "user_id" | "created_at" | "updated_at">) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .insert([{ ...subscription, user_id: user.id }])
-      .select()
-      .single()
-
-    if (!error && data) {
-      setSubscriptions((prev) => [...prev, data])
-    }
+    setSubscriptions((prev) => [...prev, newSubscription])
   }
 
-  const updateSubscription = async (id: string, updates: Partial<Subscription>) => {
-    const { data, error } = await supabase
-      .from("subscriptions")
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .select()
-      .single()
-
-    if (!error && data) {
-      setSubscriptions((prev) =>
-        prev.map((sub) => (sub.id === id ? data : sub))
-      )
-    }
+  const updateSubscription = (id: string, updates: Partial<Subscription>) => {
+    setSubscriptions((prev) =>
+      prev.map((sub) => (sub.id === id ? { ...sub, ...updates } : sub))
+    )
   }
 
-  const deleteSubscription = async (id: string) => {
-    const { error } = await supabase.from("subscriptions").delete().eq("id", id)
-
-    if (!error) {
-      setSubscriptions((prev) => prev.filter((sub) => sub.id !== id))
-    }
+  const deleteSubscription = (id: string) => {
+    setSubscriptions((prev) => prev.filter((sub) => sub.id !== id))
   }
 
   return (
@@ -112,11 +114,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       value={{
         subscriptions,
         loading,
-        user,
         addSubscription,
         updateSubscription,
         deleteSubscription,
-        refreshSubscriptions: fetchSubscriptions,
       }}
     >
       {children}

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,11 +18,8 @@ import {
   Globe, 
   ChevronRight,
   Check,
-  Sparkles,
-  Loader2
+  Sparkles
 } from "lucide-react"
-import { useSubscriptions } from "@/lib/subscription-context"
-import { createClient } from "@/lib/supabase/client"
 
 const billingPlans = [
   {
@@ -57,12 +53,9 @@ const settingsOptions = [
 ]
 
 export function SettingsPage() {
-  const { user } = useSubscriptions()
-  const router = useRouter()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [profile, setProfile] = useState({
-    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User",
-    email: user?.email || "",
+    name: "Demo User",
+    email: "demo@subtrack.app",
     avatar: ""
   })
   const [isEditing, setIsEditing] = useState(false)
@@ -71,14 +64,6 @@ export function SettingsPage() {
     "Dark Mode": true,
     "Two-Factor Auth": false,
   })
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/auth/login")
-    router.refresh()
-  }
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
@@ -116,7 +101,6 @@ export function SettingsPage() {
                     onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                     className="max-w-sm bg-secondary/50 border-border focus:border-primary transition-all duration-200"
                     placeholder="Your email"
-                    disabled
                   />
                   <div className="flex gap-2">
                     <Button 
@@ -261,15 +245,9 @@ export function SettingsPage() {
           <Button 
             variant="ghost" 
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-300 group"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
           >
-            {isLoggingOut ? (
-              <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-            ) : (
-              <LogOut className="w-5 h-5 mr-3 transition-transform duration-200 group-hover:-translate-x-1" />
-            )}
-            {isLoggingOut ? "Logging out..." : "Log Out"}
+            <LogOut className="w-5 h-5 mr-3 transition-transform duration-200 group-hover:-translate-x-1" />
+            Log Out
           </Button>
         </CardContent>
       </Card>
