@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { Bell, Mail, MessageSquare, Smartphone, Plus, X, Check } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Bell, Mail, MessageSquare, Smartphone, Plus, X, Check, BellRing } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Field, FieldContent, FieldDescription, FieldLabel, FieldTitle } from "@/components/ui/field"
+import { useSubscriptions } from "@/lib/subscription-context"
+import { useNotifications } from "@/hooks/use-notifications"
 
 interface ContactItem {
   id: string
@@ -21,7 +22,32 @@ interface NotificationChannel {
 }
 
 export function AlertsPage() {
-  const [pushEnabled, setPushEnabled] = useState(true)
+  const { subscriptions } = useSubscriptions()
+  const { permission, isSupported, requestPermission, checkUpcomingPayments } = useNotifications(subscriptions)
+  const [pushEnabled, setPushEnabled] = useState(false)
+
+  // Sync push enabled state with actual permission
+  useEffect(() => {
+    setPushEnabled(permission === "granted")
+  }, [permission])
+
+  const handlePushToggle = async (enabled: boolean) => {
+    if (enabled && permission !== "granted") {
+      const newPermission = await requestPermission()
+      setPushEnabled(newPermission === "granted")
+    } else {
+      setPushEnabled(enabled)
+    }
+  }
+
+  const handleTestNotification = () => {
+    if (permission === "granted") {
+      new Notification("SubTrack Test Notification", {
+        body: "Push notifications are working! You will be notified 1 day before subscription renewals.",
+        icon: "/icon-192.png",
+      })
+    }
+  }
   
   const [emailNotif, setEmailNotif] = useState<NotificationChannel>({
     enabled: true,
@@ -117,20 +143,54 @@ export function AlertsPage() {
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg">Push Notifications</CardTitle>
-              <CardDescription>Receive alerts directly on your device</CardDescription>
+              <CardDescription>Receive alerts 1 day before subscription renewals</CardDescription>
             </div>
             <Switch 
               checked={pushEnabled} 
-              onCheckedChange={setPushEnabled}
+              onCheckedChange={handlePushToggle}
+              disabled={!isSupported}
             />
           </div>
         </CardHeader>
-        <CardContent className="pt-0">
-          <p className="text-sm text-muted-foreground">
-            {pushEnabled 
-              ? "You will receive push notifications for upcoming payments and subscription renewals."
-              : "Push notifications are disabled. Enable to stay updated on your subscriptions."}
-          </p>
+        <CardContent className="space-y-3 pt-0">
+          {!isSupported ? (
+            <p className="text-sm text-destructive">
+              Push notifications are not supported in this browser.
+            </p>
+          ) : permission === "denied" ? (
+            <p className="text-sm text-destructive">
+              Push notifications are blocked. Please enable them in your browser settings.
+            </p>
+          ) : pushEnabled ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                You will receive push notifications 1 day before each subscription payment is due.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleTestNotification}
+                  className="transition-all duration-200 ease-out hover:border-primary hover:bg-primary/5"
+                >
+                  <BellRing className="w-4 h-4 mr-2" />
+                  Test Notification
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={checkUpcomingPayments}
+                  className="transition-all duration-200 ease-out hover:border-primary hover:bg-primary/5"
+                >
+                  Check Upcoming Payments
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Enable push notifications to receive reminders 1 day before subscription renewals.
+            </p>
+          )}
         </CardContent>
       </Card>
 
