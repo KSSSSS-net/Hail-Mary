@@ -25,25 +25,29 @@ export function ExpenseCards() {
             <div>
               <p className="text-3xl font-bold text-foreground">$284.47</p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="flex items-center text-sm text-primary">
-                  <TrendingDown className="w-4 h-4 mr-1" />
-                  12%
+                <span className="flex items-center text-sm text-primary group/trend cursor-pointer">
+                  <TrendingDown className="w-4 h-4 mr-1 transition-transform duration-300 ease-out group-hover/trend:-translate-y-0.5" />
+                  <span className="transition-all duration-200 ease-out group-hover/trend:font-bold">12%</span>
                 </span>
                 <span className="text-sm text-muted-foreground">vs last month</span>
               </div>
             </div>
             <div className="flex flex-col items-end gap-1">
               <div className="text-xs text-muted-foreground">Feb 2026</div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 group">
                 {[40, 65, 45, 80, 55, 70, 50].map((height, i) => (
                   <div
                     key={i}
-                    className="w-2 bg-primary/20 rounded-full overflow-hidden"
+                    className="w-2 bg-primary/20 rounded-full overflow-hidden transition-all duration-300 ease-out hover:bg-primary/30"
                     style={{ height: "40px" }}
                   >
                     <div 
-                      className="w-full bg-primary rounded-full transition-all duration-500"
-                      style={{ height: `${height}%`, marginTop: `${100 - height}%` }}
+                      className="w-full bg-primary rounded-full transition-all duration-500 ease-out hover:opacity-80"
+                      style={{ 
+                        height: `${height}%`, 
+                        marginTop: `${100 - height}%`,
+                        transitionDelay: `${i * 50}ms`
+                      }}
                     />
                   </div>
                 ))}
@@ -63,10 +67,14 @@ export function ExpenseCards() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {upcomingBills.map((bill) => (
-              <div key={bill.name} className="flex items-center justify-between p-2 -mx-2 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 cursor-pointer">
+            {upcomingBills.map((bill, index) => (
+              <div 
+                key={bill.name} 
+                className="flex items-center justify-between p-2 -mx-2 rounded-lg transition-all duration-300 ease-out hover:bg-secondary/50 hover:translate-x-1 cursor-pointer group"
+                style={{ transitionDelay: `${index * 50}ms` }}
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${bill.color} flex items-center justify-center text-white text-sm font-bold transition-transform duration-200 ease-out group-hover:scale-110`}>
+                  <div className={`w-8 h-8 rounded-lg ${bill.color} flex items-center justify-center text-white text-sm font-bold transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-lg`}>
                     {bill.logo}
                   </div>
                   <div>
@@ -74,13 +82,13 @@ export function ExpenseCards() {
                     <p className="text-xs text-muted-foreground">{bill.dueDate}</p>
                   </div>
                 </div>
-                <p className="text-sm font-semibold text-foreground">${bill.amount}</p>
+                <p className="text-sm font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105">${bill.amount}</p>
               </div>
             ))}
           </div>
-          <div className="mt-4 pt-3 border-t border-border flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Total due this week</span>
-            <span className="text-lg font-bold text-primary">$28.97</span>
+          <div className="mt-4 pt-3 border-t border-border flex justify-between items-center group/total cursor-pointer transition-all duration-200 ease-out hover:bg-secondary/30 -mx-2 px-2 rounded-lg">
+            <span className="text-sm text-muted-foreground group-hover/total:text-foreground transition-colors duration-200">Total due this week</span>
+            <span className="text-lg font-bold text-primary transition-all duration-200 ease-out group-hover/total:scale-105">$28.97</span>
           </div>
         </CardContent>
       </Card>

@@ -5,6 +5,8 @@ import { FloatingDock, type TabType } from "@/components/floating-dock"
 import { ExpenseCards } from "@/components/expense-cards"
 import { SubscriptionsTable } from "@/components/subscriptions-table"
 import { AlertsPage } from "@/components/alerts-page"
+import { InsightsPage } from "@/components/insights-page"
+import { SettingsPage } from "@/components/settings-page"
 import { AddSubscriptionDialog } from "@/components/add-subscription-dialog"
 
 export default function OverviewPage() {
@@ -45,15 +47,11 @@ export default function OverviewPage() {
           )}
 
           {activeTab === "insights" && (
-            <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl transition-all duration-300 ease-out hover:border-primary/30">
-              <p className="text-muted-foreground">Insights coming soon</p>
-            </div>
+            <InsightsPage />
           )}
 
           {activeTab === "settings" && (
-            <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl transition-all duration-300 ease-out hover:border-primary/30">
-              <p className="text-muted-foreground">Settings coming soon</p>
-            </div>
+            <SettingsPage />
           )}
         </div>
       </div>

@@ -112,36 +112,40 @@ const subscriptions = [
 export function SubscriptionsTable() {
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 ease-out">
-      <div className="px-6 py-4 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground">All Subscriptions</h2>
-        <p className="text-sm text-muted-foreground">Manage and track your active subscriptions</p>
+      <div className="px-6 py-4 border-b border-border group/header cursor-default">
+        <h2 className="text-lg font-semibold text-foreground transition-all duration-200 ease-out group-hover/header:text-primary">All Subscriptions</h2>
+        <p className="text-sm text-muted-foreground transition-all duration-200 ease-out group-hover/header:text-foreground">Manage and track your active subscriptions</p>
       </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">Subscription Name</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Date of Purchase</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Upcoming Payment</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Amount</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Category</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Subscription Name</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Date of Purchase</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Upcoming Payment</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Amount</TableHead>
+              <TableHead className="text-muted-foreground font-medium transition-colors duration-200 ease-out hover:text-foreground cursor-default">Category</TableHead>
               <TableHead className="text-muted-foreground font-medium w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {subscriptions.map((sub) => (
-              <TableRow key={sub.id} className="border-border hover:bg-secondary/50 transition-all duration-200 ease-out group cursor-pointer">
+            {subscriptions.map((sub, index) => (
+              <TableRow 
+                key={sub.id} 
+                className="border-border hover:bg-secondary/50 transition-all duration-300 ease-out group cursor-pointer"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl ${sub.color} flex items-center justify-center text-white font-bold shadow-lg transition-all duration-200 ease-out group-hover:scale-110 group-hover:shadow-xl`}>
+                    <div className={`w-10 h-10 rounded-xl ${sub.color} flex items-center justify-center text-white font-bold shadow-lg transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-xl group-hover:rotate-3`}>
                       {sub.logo}
                     </div>
-                    <span className="font-medium text-foreground">{sub.name}</span>
+                    <span className="font-medium text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:translate-x-1">{sub.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{sub.purchaseDate}</TableCell>
+                <TableCell className="text-muted-foreground transition-colors duration-200 ease-out group-hover:text-foreground">{sub.purchaseDate}</TableCell>
                 <TableCell className="text-foreground font-medium">{sub.upcomingPayment}</TableCell>
-                <TableCell className="font-semibold text-foreground">${sub.amount.toFixed(2)}</TableCell>
+                <TableCell className="font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105 origin-left">${sub.amount.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant="secondary" className={`${sub.categoryColor} border-0 font-medium transition-all duration-200 ease-out hover:scale-105`}>
                     {sub.category}
@@ -166,9 +170,9 @@ export function SubscriptionsTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="px-6 py-4 border-t border-border flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">{subscriptions.length} active subscriptions</span>
-        <span className="text-sm font-semibold text-foreground">
+      <div className="px-6 py-4 border-t border-border flex justify-between items-center group/footer cursor-default">
+        <span className="text-sm text-muted-foreground transition-all duration-200 ease-out group-hover/footer:text-foreground">{subscriptions.length} active subscriptions</span>
+        <span className="text-sm font-semibold text-foreground transition-all duration-200 ease-out group-hover/footer:scale-105 origin-right">
           Monthly total: <span className="text-primary">${subscriptions.reduce((acc, sub) => acc + sub.amount, 0).toFixed(2)}</span>
         </span>
       </div>
