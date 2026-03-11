@@ -1,9 +1,12 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createClient } from "@/lib/supabase/client"
+import type { User } from "@supabase/supabase-js"
 
 export interface Subscription {
   id: string
+  user_id: string
   name: string
   amount: number
   category: string
@@ -16,97 +19,111 @@ export interface Subscription {
 interface SubscriptionContextType {
   subscriptions: Subscription[]
   loading: boolean
-  addSubscription: (subscription: Omit<Subscription, "id">) => void
-  updateSubscription: (id: string, subscription: Partial<Subscription>) => void
-  deleteSubscription: (id: string) => void
+  user: User | null
+  addSubscription: (subscription: Omit<Subscription, "id" | "user_id">) => Promise<void>
+  updateSubscription: (id: string, subscription: Partial<Subscription>) => Promise<void>
+  deleteSubscription: (id: string) => Promise<void>
+  refreshSubscriptions: () => Promise<void>
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined)
 
-// Sample subscriptions for demo
-const sampleSubscriptions: Subscription[] = [
-  {
-    id: "1",
-    name: "Netflix",
-    amount: 15.99,
-    category: "Entertainment",
-    billing_date: "2026-03-15",
-    purchase_date: "2024-01-10",
-    logo: "N",
-    color: "bg-red-600",
-  },
-  {
-    id: "2",
-    name: "Spotify",
-    amount: 9.99,
-    category: "Music",
-    billing_date: "2026-03-20",
-    purchase_date: "2023-06-15",
-    logo: "S",
-    color: "bg-green-600",
-  },
-  {
-    id: "3",
-    name: "Adobe CC",
-    amount: 54.99,
-    category: "Productivity",
-    billing_date: "2026-03-25",
-    purchase_date: "2024-02-01",
-    logo: "Ai",
-    color: "bg-orange-600",
-  },
-  {
-    id: "4",
-    name: "iCloud",
-    amount: 2.99,
-    category: "Storage",
-    billing_date: "2026-03-18",
-    purchase_date: "2022-11-20",
-    logo: "iC",
-    color: "bg-blue-500",
-  },
-  {
-    id: "5",
-    name: "YouTube Premium",
-    amount: 13.99,
-    category: "Entertainment",
-    billing_date: "2026-03-22",
-    purchase_date: "2024-03-05",
-    logo: "YT",
-    color: "bg-red-500",
-  },
-  {
-    id: "6",
-    name: "ChatGPT Plus",
-    amount: 20.00,
-    category: "AI Tools",
-    billing_date: "2026-03-28",
-    purchase_date: "2024-05-10",
-    logo: "GP",
-    color: "bg-emerald-600",
-  },
-]
-
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(sampleSubscriptions)
-  const [loading] = useState(false)
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null)
+  const supabase = createClient()
 
-  const addSubscription = (subscription: Omit<Subscription, "id">) => {
-    const newSubscription: Subscription = {
-      ...subscription,
-      id: crypto.randomUUID(),
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      if (user) {
+        await fetchSubscriptions()
+      } else {
+        setLoading(false)
+      }
     }
-    setSubscriptions((prev) => [...prev, newSubscription])
+
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        await fetchSubscriptions()
+      } else {
+        setSubscriptions([])
+        setLoading(false)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const fetchSubscriptions = async () => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("Error fetching subscriptions:", error)
+    } else {
+      setSubscriptions(data || [])
+    }
+    setLoading(false)
   }
 
-  const updateSubscription = (id: string, updates: Partial<Subscription>) => {
-    setSubscriptions((prev) =>
-      prev.map((sub) => (sub.id === id ? { ...sub, ...updates } : sub))
-    )
+  const addSubscription = async (subscription: Omit<Subscription, "id" | "user_id">) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .insert([{ ...subscription, user_id: user.id }])
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error adding subscription:", error)
+    } else if (data) {
+      setSubscriptions((prev) => [data, ...prev])
+    }
   }
 
-  const deleteSubscription = (id: string) => {
-    setSubscriptions((prev) => prev.filter((sub) => sub.id !== id))
+  const updateSubscription = async (id: string, updates: Partial<Subscription>) => {
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error updating subscription:", error)
+    } else if (data) {
+      setSubscriptions((prev) =>
+        prev.map((sub) => (sub.id === id ? data : sub))
+      )
+    }
+  }
+
+  const deleteSubscription = async (id: string) => {
+    const { error } = await supabase
+      .from("subscriptions")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      console.error("Error deleting subscription:", error)
+    } else {
+      setSubscriptions((prev) => prev.filter((sub) => sub.id !== id))
+    }
+  }
+
+  const refreshSubscriptions = async () => {
+    await fetchSubscriptions()
   }
 
   return (
@@ -114,9 +131,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       value={{
         subscriptions,
         loading,
+        user,
         addSubscription,
         updateSubscription,
         deleteSubscription,
+        refreshSubscriptions,
       }}
     >
       {children}

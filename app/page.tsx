@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 import { FloatingDock, type TabType } from "@/components/floating-dock"
 import { ExpenseCards } from "@/components/expense-cards"
@@ -19,10 +20,32 @@ const pageTitle: Record<TabType, { title: string; description: string }> = {
   settings: { title: "Settings", description: "Manage your account and preferences" },
 }
 
-function OverviewPage() {
+function DashboardContent() {
   const [activeTab, setActiveTab] = useState<TabType>("overview")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const { subscriptions, loading } = useSubscriptions()
+  const { subscriptions, loading, user } = useSubscriptions()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/login")
+    }
+  }, [loading, user, router])
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground animate-pulse">Loading your subscriptions...</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   const hasSubscriptions = subscriptions.length > 0
 
@@ -39,11 +62,7 @@ function OverviewPage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out" key={activeTab}>
           {activeTab === "overview" && (
             <>
-              {loading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : hasSubscriptions ? (
+              {hasSubscriptions ? (
                 <>
                   <section className="mb-8">
                     <ExpenseCards />
@@ -89,7 +108,7 @@ function OverviewPage() {
 export default function Home() {
   return (
     <SubscriptionProvider>
-      <OverviewPage />
+      <DashboardContent />
     </SubscriptionProvider>
   )
 }

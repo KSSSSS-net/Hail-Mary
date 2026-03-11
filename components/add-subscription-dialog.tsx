@@ -33,24 +33,29 @@ export function AddSubscriptionDialog({ open, onOpenChange }: AddSubscriptionDia
   const [loading, setLoading] = useState(false)
   const { addSubscription } = useSubscriptions()
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !amount || !category || !billingDate) return
 
-    addSubscription({
-      name,
-      amount: parseFloat(amount),
-      category,
-      billing_date: billingDate,
-      purchase_date: new Date().toISOString().split("T")[0],
-      logo: name.charAt(0).toUpperCase(),
-      color: categoryColors[category] || "bg-primary",
-    })
-    
-    onOpenChange(false)
-    setName("")
-    setAmount("")
-    setCategory("")
-    setBillingDate("")
+    setLoading(true)
+    try {
+      await addSubscription({
+        name,
+        amount: parseFloat(amount),
+        category,
+        billing_date: billingDate,
+        purchase_date: new Date().toISOString().split("T")[0],
+        logo: name.charAt(0).toUpperCase(),
+        color: categoryColors[category] || "bg-primary",
+      })
+      
+      onOpenChange(false)
+      setName("")
+      setAmount("")
+      setCategory("")
+      setBillingDate("")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

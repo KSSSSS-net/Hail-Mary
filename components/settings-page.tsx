@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,8 @@ import {
   Check,
   Sparkles
 } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useSubscriptions } from "@/lib/subscription-context"
 
 const billingPlans = [
   {
@@ -53,9 +56,13 @@ const settingsOptions = [
 ]
 
 export function SettingsPage() {
+  const router = useRouter()
+  const { user } = useSubscriptions()
+  const supabase = createClient()
+  
   const [profile, setProfile] = useState({
-    name: "Demo User",
-    email: "demo@subtrack.app",
+    name: user?.user_metadata?.name || user?.email?.split("@")[0] || "User",
+    email: user?.email || "",
     avatar: ""
   })
   const [isEditing, setIsEditing] = useState(false)
@@ -67,6 +74,11 @@ export function SettingsPage() {
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/auth/login")
   }
 
   return (
@@ -244,6 +256,7 @@ export function SettingsPage() {
         <CardContent className="p-4">
           <Button 
             variant="ghost" 
+            onClick={handleLogout}
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-300 group"
           >
             <LogOut className="w-5 h-5 mr-3 transition-transform duration-200 group-hover:-translate-x-1" />
