@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Table,
   TableBody,
@@ -17,7 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useSubscriptions } from "@/lib/subscription-context"
+import { useSubscriptions, type Subscription } from "@/lib/subscription-context"
+import { EditSubscriptionDialog } from "@/components/edit-subscription-dialog"
 
 const categoryColors: Record<string, string> = {
   entertainment: "bg-pink-500/20 text-pink-400",
@@ -40,9 +42,16 @@ function formatDate(dateString: string) {
 
 export function SubscriptionsTable() {
   const { subscriptions, deleteSubscription } = useSubscriptions()
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
 
   const handleDelete = async (id: string) => {
     await deleteSubscription(id)
+  }
+
+  const handleEdit = (subscription: Subscription) => {
+    setSelectedSubscription(subscription)
+    setEditDialogOpen(true)
   }
 
   return (
@@ -100,7 +109,10 @@ export function SubscriptionsTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-card border-border">
-                      <DropdownMenuItem className="cursor-pointer gap-2">
+                      <DropdownMenuItem 
+                        className="cursor-pointer gap-2"
+                        onClick={() => handleEdit(sub)}
+                      >
                         <Edit className="w-4 h-4" />
                         Edit
                       </DropdownMenuItem>
@@ -125,6 +137,12 @@ export function SubscriptionsTable() {
           Monthly total: <span className="text-primary">₹{subscriptions.reduce((acc, sub) => acc + Number(sub.amount), 0).toFixed(2)}</span>
         </span>
       </div>
+
+      <EditSubscriptionDialog 
+        open={editDialogOpen} 
+        onOpenChange={setEditDialogOpen} 
+        subscription={selectedSubscription}
+      />
     </div>
   )
 }
