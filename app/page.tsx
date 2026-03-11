@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+
 import { FloatingDock, type TabType } from "@/components/floating-dock"
 import { ExpenseCards } from "@/components/expense-cards"
 import { SubscriptionsTable } from "@/components/subscriptions-table"
