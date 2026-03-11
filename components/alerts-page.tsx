@@ -109,7 +109,7 @@ export function AlertsPage() {
   return (
     <div className="space-y-6">
       {/* Push Notifications */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
@@ -135,7 +135,7 @@ export function AlertsPage() {
       </Card>
 
       {/* Email Notifications */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
@@ -217,7 +217,7 @@ export function AlertsPage() {
       </Card>
 
       {/* SMS Notifications */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
@@ -299,7 +299,7 @@ export function AlertsPage() {
       </Card>
 
       {/* WhatsApp Notifications */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">

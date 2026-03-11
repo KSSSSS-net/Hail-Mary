@@ -47,7 +47,7 @@ export function ExpenseCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Last Month Expenses Card */}
-      <Card className="bg-card border-border overflow-hidden transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
+      <Card className="bg-card border-border overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-2">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <IndianRupee className="w-4 h-4" />
@@ -98,7 +98,7 @@ export function ExpenseCards() {
       </Card>
 
       {/* Upcoming Bills Card */}
-      <Card className="bg-card border-border overflow-hidden transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
+      <Card className="bg-card border-border overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-2">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <Calendar className="w-4 h-4" />

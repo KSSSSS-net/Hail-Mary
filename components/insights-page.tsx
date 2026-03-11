@@ -157,7 +157,7 @@ export function InsightsPage() {
         {stats.map((stat, index) => (
           <Card 
             key={stat.title} 
-            className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 group cursor-pointer"
+            className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-2 group cursor-pointer"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <CardContent className="p-5">
@@ -179,7 +179,7 @@ export function InsightsPage() {
       </div>
 
       {/* Budget Progress */}
-      <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardContent className="p-5">
           <div className="flex justify-between items-center mb-3">
             <div>
@@ -197,7 +197,7 @@ export function InsightsPage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Spending Trend */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
@@ -246,7 +246,7 @@ export function InsightsPage() {
         </Card>
 
         {/* Category Breakdown */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <PieChartIcon className="w-4 h-4 text-primary" />
@@ -308,7 +308,7 @@ export function InsightsPage() {
       {/* Cost Distribution & Weekly Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Price Distribution */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
@@ -335,7 +335,7 @@ export function InsightsPage() {
         </Card>
 
         {/* Weekly Payment Activity */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
@@ -374,7 +374,7 @@ export function InsightsPage() {
       {/* Top Spending & Upcoming Renewals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Spending */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-primary" />
@@ -409,7 +409,7 @@ export function InsightsPage() {
         </Card>
 
         {/* Upcoming Renewals */}
-        <Card className="bg-card border-border transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="bg-card border-border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />

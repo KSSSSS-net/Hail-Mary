@@ -84,7 +84,7 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       {/* Profile Section */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 overflow-hidden">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
         <CardContent className="-mt-12 pb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
@@ -159,7 +159,7 @@ export function SettingsPage() {
       </Card>
 
       {/* Billing Section */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-primary" />
@@ -214,7 +214,7 @@ export function SettingsPage() {
       </Card>
 
       {/* Preferences Section */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      <Card className="border-border bg-card transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-foreground">Preferences</CardTitle>
           <CardDescription className="text-muted-foreground">
