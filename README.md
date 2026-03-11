@@ -60,48 +60,6 @@ The app uses a mobile-first approach with Tailwind's responsive prefixes. A floa
 ### Data Visualization
 The Insights page uses Recharts to display spending trends, category breakdowns, and budget tracking through area charts, pie charts, and bar charts.
 
-## Project Structure
-
-```
-app/
-  auth/           # Authentication pages (login, sign-up)
-  page.tsx        # Main dashboard
-  layout.tsx      # Root layout with providers
-  globals.css     # Global styles and design tokens
-components/
-  ui/             # shadcn/ui components
-  floating-dock.tsx
-  expense-cards.tsx
-  subscriptions-table.tsx
-  insights-page.tsx
-  settings-page.tsx
-  alerts-page.tsx
-lib/
-  supabase/       # Supabase client configuration
-  subscription-context.tsx  # Global state management
-  utils.ts        # Utility functions
-```
-
-## Getting Started
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set up environment variables:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
 ## Features
 
 - User authentication with email/password
