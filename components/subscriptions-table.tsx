@@ -80,7 +80,7 @@ export function SubscriptionsTable() {
                 </TableCell>
                 <TableCell className="text-muted-foreground transition-colors duration-200 ease-out group-hover:text-foreground">{formatDate(sub.purchase_date)}</TableCell>
                 <TableCell className="text-foreground font-medium">{formatDate(sub.billing_date)}</TableCell>
-                <TableCell className="font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105 origin-left">${Number(sub.amount).toFixed(2)}</TableCell>
+                <TableCell className="font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105 origin-left">₹{Number(sub.amount).toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant="secondary" className={`${categoryColors[sub.category] || "bg-gray-500/20 text-gray-400"} border-0 font-medium transition-all duration-200 ease-out hover:scale-105 capitalize`}>
                     {sub.category}
@@ -116,7 +116,7 @@ export function SubscriptionsTable() {
       <div className="px-6 py-4 border-t border-border flex justify-between items-center group/footer cursor-default">
         <span className="text-sm text-muted-foreground transition-all duration-200 ease-out group-hover/footer:text-foreground">{subscriptions.length} active subscriptions</span>
         <span className="text-sm font-semibold text-foreground transition-all duration-200 ease-out group-hover/footer:scale-105 origin-right">
-          Monthly total: <span className="text-primary">${subscriptions.reduce((acc, sub) => acc + Number(sub.amount), 0).toFixed(2)}</span>
+          Monthly total: <span className="text-primary">₹{subscriptions.reduce((acc, sub) => acc + Number(sub.amount), 0).toFixed(2)}</span>
         </span>
       </div>
     </div>

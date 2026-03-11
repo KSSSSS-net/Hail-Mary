@@ -27,21 +27,21 @@ import { useSubscriptions } from "@/lib/subscription-context"
 const billingPlans = [
   {
     name: "Free",
-    price: "$0",
+    price: "₹0",
     period: "/month",
     features: ["Up to 5 subscriptions", "Basic analytics", "Email reminders"],
     current: false
   },
   {
     name: "Pro",
-    price: "$9.99",
+    price: "₹799",
     period: "/month",
     features: ["Unlimited subscriptions", "Advanced analytics", "All notification channels", "Export reports"],
     current: true
   },
   {
     name: "Team",
-    price: "$24.99",
+    price: "₹1999",
     period: "/month",
     features: ["Everything in Pro", "Team sharing", "Admin controls", "Priority support"],
     current: false

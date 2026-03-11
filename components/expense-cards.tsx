@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingDown, TrendingUp, Calendar, DollarSign } from "lucide-react"
+import { TrendingDown, TrendingUp, Calendar, IndianRupee } from "lucide-react"
 import { useSubscriptions } from "@/lib/subscription-context"
 import { useMemo } from "react"
 
@@ -50,14 +50,14 @@ export function ExpenseCards() {
       <Card className="bg-card border-border overflow-hidden transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <DollarSign className="w-4 h-4" />
+            <IndianRupee className="w-4 h-4" />
             Monthly Expenses
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-3xl font-bold text-foreground">${monthlyTotal.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-foreground">₹{monthlyTotal.toFixed(2)}</p>
               <div className="flex items-center gap-1 mt-2">
                 {monthlyTotal > 0 ? (
                   <>
@@ -123,7 +123,7 @@ export function ExpenseCards() {
                       <p className="text-xs text-muted-foreground">{formatDate(bill.billing_date)}</p>
                     </div>
                   </div>
-                  <p className="text-sm font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105">${Number(bill.amount).toFixed(2)}</p>
+                  <p className="text-sm font-semibold text-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-105">₹{Number(bill.amount).toFixed(2)}</p>
                 </div>
               ))
             ) : (
@@ -132,7 +132,7 @@ export function ExpenseCards() {
           </div>
           <div className="mt-4 pt-3 border-t border-border flex justify-between items-center group/total cursor-pointer transition-all duration-200 ease-out hover:bg-secondary/30 -mx-2 px-2 rounded-lg">
             <span className="text-sm text-muted-foreground group-hover/total:text-foreground transition-colors duration-200">Total due this week</span>
-            <span className="text-lg font-bold text-primary transition-all duration-200 ease-out group-hover/total:scale-105">${upcomingTotal.toFixed(2)}</span>
+            <span className="text-lg font-bold text-primary transition-all duration-200 ease-out group-hover/total:scale-105">₹{upcomingTotal.toFixed(2)}</span>
           </div>
         </CardContent>
       </Card>

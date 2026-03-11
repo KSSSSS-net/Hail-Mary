@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { TrendingUp, TrendingDown, DollarSign, CreditCard, PieChart as PieChartIcon, BarChart3, Calendar, ArrowUpRight, ArrowDownRight, Wallet, Target } from "lucide-react"
+import { TrendingUp, TrendingDown, IndianRupee, CreditCard, PieChart as PieChartIcon, BarChart3, Calendar, ArrowUpRight, ArrowDownRight, Wallet, Target } from "lucide-react"
 import { 
   AreaChart, 
   Area, 
@@ -66,12 +66,12 @@ export function InsightsPage() {
 
   const costDistribution = useMemo(() => {
     const ranges = [
-      { range: "$0-5", min: 0, max: 5, count: 0 },
-      { range: "$5-10", min: 5, max: 10, count: 0 },
-      { range: "$10-15", min: 10, max: 15, count: 0 },
-      { range: "$15-20", min: 15, max: 20, count: 0 },
-      { range: "$20-50", min: 20, max: 50, count: 0 },
-      { range: "$50+", min: 50, max: Infinity, count: 0 },
+      { range: "₹0-500", min: 0, max: 500, count: 0 },
+      { range: "₹500-1000", min: 500, max: 1000, count: 0 },
+      { range: "₹1000-1500", min: 1000, max: 1500, count: 0 },
+      { range: "₹1500-2000", min: 1500, max: 2000, count: 0 },
+      { range: "₹2000-5000", min: 2000, max: 5000, count: 0 },
+      { range: "₹5000+", min: 5000, max: Infinity, count: 0 },
     ]
     subscriptions.forEach((sub) => {
       const amount = Number(sub.amount)
@@ -104,16 +104,16 @@ export function InsightsPage() {
   }, [subscriptions])
 
   const averageCost = subscriptions.length > 0 ? monthlyTotal / subscriptions.length : 0
-  const budget = 400
+  const budget = 10000
   const budgetUsed = Math.min(100, (monthlyTotal / budget) * 100)
 
   const stats = [
     { 
       title: "Total Monthly", 
-      value: `$${monthlyTotal.toFixed(2)}`, 
+      value: `₹${monthlyTotal.toFixed(2)}`, 
       change: subscriptions.length > 0 ? "-12%" : "0%", 
       trend: "down",
-      icon: DollarSign,
+      icon: IndianRupee,
       subtitle: "recurring charges"
     },
     { 
@@ -126,7 +126,7 @@ export function InsightsPage() {
     },
     { 
       title: "Avg. Cost", 
-      value: `$${averageCost.toFixed(2)}`, 
+      value: `₹${averageCost.toFixed(2)}`, 
       change: subscriptions.length > 0 ? "-8%" : "0%", 
       trend: "down",
       icon: Wallet,
@@ -134,11 +134,11 @@ export function InsightsPage() {
     },
     { 
       title: "Budget Left", 
-      value: `$${Math.max(0, budget - monthlyTotal).toFixed(2)}`, 
+      value: `₹${Math.max(0, budget - monthlyTotal).toFixed(2)}`, 
       change: `${(100 - budgetUsed).toFixed(0)}%`, 
       trend: budgetUsed < 80 ? "up" : "down",
       icon: Target,
-      subtitle: `of $${budget} monthly`
+      subtitle: `of ₹${budget} monthly`
     },
   ]
 
@@ -184,7 +184,7 @@ export function InsightsPage() {
           <div className="flex justify-between items-center mb-3">
             <div>
               <h3 className="font-semibold text-foreground">Monthly Budget</h3>
-              <p className="text-sm text-muted-foreground">${monthlyTotal.toFixed(2)} of ${budget} used</p>
+              <p className="text-sm text-muted-foreground">₹{monthlyTotal.toFixed(2)} of ₹{budget} used</p>
             </div>
             <span className={`text-sm font-medium ${budgetUsed >= 80 ? "text-destructive" : "text-primary"}`}>
               {budgetUsed.toFixed(0)}%
@@ -224,7 +224,7 @@ export function InsightsPage() {
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `₹${value}`}
                 />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
@@ -295,7 +295,7 @@ export function InsightsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-muted-foreground text-xs">{category.subscriptions} subs</span>
-                      <span className="font-medium text-foreground group-hover:text-primary transition-colors duration-200">${category.value.toFixed(2)}</span>
+                      <span className="font-medium text-foreground group-hover:text-primary transition-colors duration-200">₹{category.value.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
@@ -356,7 +356,7 @@ export function InsightsPage() {
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `₹${value}`}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar 
@@ -401,7 +401,7 @@ export function InsightsPage() {
                         <p className="text-xs text-muted-foreground capitalize">{sub.category}</p>
                       </div>
                     </div>
-                    <span className="font-semibold text-foreground group-hover:text-primary transition-all duration-200">${Number(sub.amount).toFixed(2)}</span>
+                    <span className="font-semibold text-foreground group-hover:text-primary transition-all duration-200">₹{Number(sub.amount).toFixed(2)}</span>
                   </div>
                 ))}
             </div>
