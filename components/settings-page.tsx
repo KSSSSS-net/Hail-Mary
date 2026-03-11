@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,8 +19,11 @@ import {
   Globe, 
   ChevronRight,
   Check,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react"
+import { useSubscriptions } from "@/lib/subscription-context"
+import { createClient } from "@/lib/supabase/client"
 
 const billingPlans = [
   {
@@ -53,9 +57,12 @@ const settingsOptions = [
 ]
 
 export function SettingsPage() {
+  const { user } = useSubscriptions()
+  const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [profile, setProfile] = useState({
-    name: "Alex Johnson",
-    email: "alex.johnson@email.com",
+    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || "User",
+    email: user?.email || "",
     avatar: ""
   })
   const [isEditing, setIsEditing] = useState(false)
@@ -64,6 +71,18 @@ export function SettingsPage() {
     "Dark Mode": true,
     "Two-Factor Auth": false,
   })
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/auth/login")
+    router.refresh()
+  }
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
+  }
 
   return (
     <div className="space-y-6">
@@ -76,7 +95,7 @@ export function SettingsPage() {
               <Avatar className="w-24 h-24 border-4 border-card shadow-xl transition-transform duration-300 ease-out group-hover:scale-105">
                 <AvatarImage src={profile.avatar} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                  {profile.name.split(' ').map(n => n[0]).join('')}
+                  {getInitials(profile.name)}
                 </AvatarFallback>
               </Avatar>
               <button className="absolute bottom-0 right-0 p-2 rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all duration-200 ease-out hover:scale-110">
@@ -97,34 +116,41 @@ export function SettingsPage() {
                     onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                     className="max-w-sm bg-secondary/50 border-border focus:border-primary transition-all duration-200"
                     placeholder="Your email"
+                    disabled
                   />
                   <div className="flex gap-2">
                     <Button 
                       size="sm" 
                       onClick={() => setIsEditing(false)}
-                      className="transition-all duration-200 ease-out hover:scale-105"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 active:scale-95"
                     >
-                      Save Changes
+                      Save
                     </Button>
                     <Button 
                       size="sm" 
                       variant="ghost" 
                       onClick={() => setIsEditing(false)}
-                      className="transition-all duration-200 ease-out hover:scale-105"
+                      className="hover:bg-secondary transition-all duration-200"
                     >
                       Cancel
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="animate-in fade-in duration-300">
-                  <h2 className="text-xl font-bold text-foreground">{profile.name}</h2>
-                  <p className="text-muted-foreground">{profile.email}</p>
+                <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h2 className="text-xl font-bold text-foreground">{profile.name}</h2>
+                    <Badge className="bg-primary/20 text-primary border-0 transition-transform duration-200 hover:scale-105">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Pro
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">{profile.email}</p>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="mt-3 transition-all duration-200 ease-out hover:scale-105 hover:border-primary"
                     onClick={() => setIsEditing(true)}
+                    className="border-border hover:border-primary hover:bg-primary/5 transition-all duration-200 active:scale-95"
                   >
                     <User className="w-4 h-4 mr-2" />
                     Edit Profile
@@ -132,10 +158,6 @@ export function SettingsPage() {
                 </div>
               )}
             </div>
-            <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-all duration-200 ease-out">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Pro Plan
-            </Badge>
           </div>
         </CardContent>
       </Card>
@@ -143,35 +165,37 @@ export function SettingsPage() {
       {/* Billing Section */}
       <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-primary" />
             Billing & Plans
           </CardTitle>
-          <CardDescription>Manage your subscription and payment methods</CardDescription>
+          <CardDescription className="text-muted-foreground">
+            Manage your subscription plan and billing preferences
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {billingPlans.map((plan, index) => (
-              <div 
+              <div
                 key={plan.name}
-                className={`relative p-4 rounded-xl border transition-all duration-300 ease-out hover:-translate-y-1 cursor-pointer group ${
+                className={`relative p-4 rounded-xl border transition-all duration-300 ease-out cursor-pointer group hover:-translate-y-1 ${
                   plan.current 
                     ? "border-primary bg-primary/5 shadow-lg shadow-primary/10" 
-                    : "border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50"
+                    : "border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
                 }`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {plan.current && (
-                  <Badge className="absolute -top-2 -right-2 bg-primary text-primary-foreground animate-pulse">
+                  <Badge className="absolute -top-2 -right-2 bg-primary text-primary-foreground border-0 shadow-lg transition-transform duration-200 group-hover:scale-110">
                     Current
                   </Badge>
                 )}
-                <h3 className="font-semibold text-foreground mb-1">{plan.name}</h3>
-                <div className="mb-3">
+                <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors duration-200">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
                   <span className="text-2xl font-bold text-foreground">{plan.price}</span>
-                  <span className="text-muted-foreground text-sm">{plan.period}</span>
+                  <span className="text-sm text-muted-foreground">{plan.period}</span>
                 </div>
-                <ul className="space-y-2 mb-4">
+                <ul className="space-y-2">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-200">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -179,13 +203,14 @@ export function SettingsPage() {
                     </li>
                   ))}
                 </ul>
-                <Button 
-                  variant={plan.current ? "secondary" : "outline"} 
-                  className="w-full transition-all duration-200 ease-out hover:scale-[1.02]"
-                  disabled={plan.current}
-                >
-                  {plan.current ? "Current Plan" : "Upgrade"}
-                </Button>
+                {!plan.current && (
+                  <Button 
+                    className="w-full mt-4 bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 active:scale-95"
+                    size="sm"
+                  >
+                    Upgrade
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -195,35 +220,34 @@ export function SettingsPage() {
       {/* Preferences Section */}
       <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
-            Preferences
-          </CardTitle>
-          <CardDescription>Customize your app experience</CardDescription>
+          <CardTitle className="text-lg font-semibold text-foreground">Preferences</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Customize your app experience
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-1">
+        <CardContent className="space-y-2">
           {settingsOptions.map((option, index) => (
-            <div 
+            <div
               key={option.label}
-              className="flex items-center justify-between p-3 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 cursor-pointer group"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-all duration-200 ease-out cursor-pointer group"
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-secondary/50 transition-all duration-200 ease-out group-hover:bg-primary/10 group-hover:scale-105">
-                  <option.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+                <div className="p-2 rounded-lg bg-primary/10 transition-transform duration-200 ease-out group-hover:scale-110">
+                  <option.icon className="w-4 h-4 text-primary" />
                 </div>
-                <span className="text-foreground font-medium">{option.label}</span>
+                <span className="text-foreground group-hover:text-primary transition-colors duration-200">{option.label}</span>
               </div>
               {option.hasToggle ? (
                 <Switch 
-                  checked={settings[option.label]}
+                  checked={settings[option.label]} 
                   onCheckedChange={(checked) => setSettings({ ...settings, [option.label]: checked })}
-                  className="transition-all duration-200 ease-out"
+                  className="transition-all duration-200"
                 />
               ) : (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <span className="text-sm">{option.value}</span>
-                  <ChevronRight className="w-4 h-4 transition-transform duration-200 ease-out group-hover:translate-x-1" />
+                  <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </div>
               )}
             </div>
@@ -232,14 +256,20 @@ export function SettingsPage() {
       </Card>
 
       {/* Logout Section */}
-      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-destructive/30 hover:shadow-lg hover:shadow-destructive/5 group">
+      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-destructive/30 hover:shadow-lg hover:shadow-destructive/5">
         <CardContent className="p-4">
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200 ease-out group"
+            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-300 group"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
           >
-            <LogOut className="w-5 h-5 mr-3 transition-transform duration-200 ease-out group-hover:-translate-x-1" />
-            Sign Out
+            {isLoggingOut ? (
+              <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+            ) : (
+              <LogOut className="w-5 h-5 mr-3 transition-transform duration-200 group-hover:-translate-x-1" />
+            )}
+            {isLoggingOut ? "Logging out..." : "Log Out"}
           </Button>
         </CardContent>
       </Card>
