@@ -17,19 +17,19 @@ function DockItem({ icon, label, isActive, onClick }: DockItemProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-200 group",
+        "flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-300 ease-out group",
         isActive 
           ? "text-primary" 
           : "text-muted-foreground hover:text-foreground"
       )}
     >
       <div className={cn(
-        "p-2 rounded-xl transition-all duration-200",
+        "p-2 rounded-xl transition-all duration-300 ease-out group-hover:scale-110 group-hover:bg-secondary/50",
         isActive && "bg-primary/10"
       )}>
         {icon}
       </div>
-      <span className="text-xs font-medium">{label}</span>
+      <span className="text-xs font-medium transition-all duration-200 ease-out group-hover:translate-y-0.5">{label}</span>
     </button>
   )
 }
@@ -43,7 +43,7 @@ interface FloatingDockProps {
 export function FloatingDock({ activeTab, onTabChange, onAddClick }: FloatingDockProps) {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-end gap-1 bg-card/80 backdrop-blur-xl border border-border rounded-2xl px-3 py-2 shadow-2xl shadow-black/50">
+      <div className="flex items-end gap-1 bg-card/80 backdrop-blur-xl border border-border rounded-2xl px-3 py-2 shadow-2xl shadow-black/50 transition-all duration-300 ease-out hover:shadow-primary/10 hover:border-primary/20">
         <DockItem 
           icon={<LayoutDashboard className="w-5 h-5" />} 
           label="Overview" 
@@ -61,9 +61,9 @@ export function FloatingDock({ activeTab, onTabChange, onAddClick }: FloatingDoc
         <div className="relative -mt-4 mx-2">
           <button 
             onClick={onAddClick}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all duration-200"
+            className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-110 active:scale-95 transition-all duration-300 ease-out hover:rotate-90"
           >
-            <Plus className="w-7 h-7" />
+            <Plus className="w-7 h-7 transition-transform duration-300 ease-out" />
           </button>
         </div>
         

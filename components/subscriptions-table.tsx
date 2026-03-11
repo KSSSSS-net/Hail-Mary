@@ -111,7 +111,7 @@ const subscriptions = [
 
 export function SubscriptionsTable() {
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 ease-out">
       <div className="px-6 py-4 border-b border-border">
         <h2 className="text-lg font-semibold text-foreground">All Subscriptions</h2>
         <p className="text-sm text-muted-foreground">Manage and track your active subscriptions</p>
@@ -130,10 +130,10 @@ export function SubscriptionsTable() {
           </TableHeader>
           <TableBody>
             {subscriptions.map((sub) => (
-              <TableRow key={sub.id} className="border-border hover:bg-secondary/50 transition-colors">
+              <TableRow key={sub.id} className="border-border hover:bg-secondary/50 transition-all duration-200 ease-out group cursor-pointer">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl ${sub.color} flex items-center justify-center text-white font-bold shadow-lg`}>
+                    <div className={`w-10 h-10 rounded-xl ${sub.color} flex items-center justify-center text-white font-bold shadow-lg transition-all duration-200 ease-out group-hover:scale-110 group-hover:shadow-xl`}>
                       {sub.logo}
                     </div>
                     <span className="font-medium text-foreground">{sub.name}</span>
@@ -143,14 +143,14 @@ export function SubscriptionsTable() {
                 <TableCell className="text-foreground font-medium">{sub.upcomingPayment}</TableCell>
                 <TableCell className="font-semibold text-foreground">${sub.amount.toFixed(2)}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className={`${sub.categoryColor} border-0 font-medium`}>
+                  <Badge variant="secondary" className={`${sub.categoryColor} border-0 font-medium transition-all duration-200 ease-out hover:scale-105`}>
                     {sub.category}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground transition-all duration-200 ease-out hover:scale-110 opacity-0 group-hover:opacity-100">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>

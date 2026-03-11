@@ -13,7 +13,7 @@ export function ExpenseCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Last Month Expenses Card */}
-      <Card className="bg-card border-border overflow-hidden">
+      <Card className="bg-card border-border overflow-hidden transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <DollarSign className="w-4 h-4" />
@@ -54,7 +54,7 @@ export function ExpenseCards() {
       </Card>
 
       {/* Upcoming Bills Card */}
-      <Card className="bg-card border-border overflow-hidden">
+      <Card className="bg-card border-border overflow-hidden transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <Calendar className="w-4 h-4" />
@@ -64,9 +64,9 @@ export function ExpenseCards() {
         <CardContent>
           <div className="space-y-3">
             {upcomingBills.map((bill) => (
-              <div key={bill.name} className="flex items-center justify-between">
+              <div key={bill.name} className="flex items-center justify-between p-2 -mx-2 rounded-lg transition-all duration-200 ease-out hover:bg-secondary/50 cursor-pointer">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${bill.color} flex items-center justify-center text-white text-sm font-bold`}>
+                  <div className={`w-8 h-8 rounded-lg ${bill.color} flex items-center justify-center text-white text-sm font-bold transition-transform duration-200 ease-out group-hover:scale-110`}>
                     {bill.logo}
                   </div>
                   <div>

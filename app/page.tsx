@@ -23,37 +23,39 @@ export default function OverviewPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">{pageTitle[activeTab].title}</h1>
-          <p className="text-muted-foreground mt-1">{pageTitle[activeTab].description}</p>
+          <h1 className="text-3xl font-bold text-foreground transition-all duration-300 ease-out">{pageTitle[activeTab].title}</h1>
+          <p className="text-muted-foreground mt-1 transition-all duration-300 ease-out">{pageTitle[activeTab].description}</p>
         </header>
 
         {/* Content based on active tab */}
-        {activeTab === "overview" && (
-          <>
-            <section className="mb-8">
-              <ExpenseCards />
-            </section>
-            <section>
-              <SubscriptionsTable />
-            </section>
-          </>
-        )}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out" key={activeTab}>
+          {activeTab === "overview" && (
+            <>
+              <section className="mb-8">
+                <ExpenseCards />
+              </section>
+              <section>
+                <SubscriptionsTable />
+              </section>
+            </>
+          )}
 
-        {activeTab === "alerts" && (
-          <AlertsPage />
-        )}
+          {activeTab === "alerts" && (
+            <AlertsPage />
+          )}
 
-        {activeTab === "insights" && (
-          <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl">
-            <p className="text-muted-foreground">Insights coming soon</p>
-          </div>
-        )}
+          {activeTab === "insights" && (
+            <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl transition-all duration-300 ease-out hover:border-primary/30">
+              <p className="text-muted-foreground">Insights coming soon</p>
+            </div>
+          )}
 
-        {activeTab === "settings" && (
-          <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl">
-            <p className="text-muted-foreground">Settings coming soon</p>
-          </div>
-        )}
+          {activeTab === "settings" && (
+            <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl transition-all duration-300 ease-out hover:border-primary/30">
+              <p className="text-muted-foreground">Settings coming soon</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating Dock Navigation */}

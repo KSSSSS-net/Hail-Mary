@@ -109,10 +109,10 @@ export function AlertsPage() {
   return (
     <div className="space-y-6">
       {/* Push Notifications */}
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
               <Bell className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
@@ -135,10 +135,10 @@ export function AlertsPage() {
       </Card>
 
       {/* Email Notifications */}
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
               <Mail className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
@@ -158,7 +158,7 @@ export function AlertsPage() {
                 {emailNotif.contacts.map((contact) => (
                   <div 
                     key={contact.id} 
-                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border"
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border transition-all duration-200 ease-out hover:bg-secondary hover:border-primary/20 group"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium">{contact.value}</span>
@@ -177,7 +177,7 @@ export function AlertsPage() {
                       variant="ghost" 
                       size="sm"
                       onClick={() => removeEmail(contact.id)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive transition-all duration-200 ease-out hover:scale-110 opacity-0 group-hover:opacity-100"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -205,7 +205,7 @@ export function AlertsPage() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => setShowEmailInput(true)}
-                  className="w-full border-dashed"
+                  className="w-full border-dashed transition-all duration-200 ease-out hover:border-primary hover:bg-primary/5"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Email Address
@@ -217,10 +217,10 @@ export function AlertsPage() {
       </Card>
 
       {/* SMS Notifications */}
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
               <Smartphone className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
@@ -240,7 +240,7 @@ export function AlertsPage() {
                 {smsNotif.contacts.map((contact) => (
                   <div 
                     key={contact.id} 
-                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border"
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border transition-all duration-200 ease-out hover:bg-secondary hover:border-primary/20 group"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium">{contact.value}</span>
@@ -259,7 +259,7 @@ export function AlertsPage() {
                       variant="ghost" 
                       size="sm"
                       onClick={() => removeSms(contact.id)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive transition-all duration-200 ease-out hover:scale-110 opacity-0 group-hover:opacity-100"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -287,7 +287,7 @@ export function AlertsPage() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => setShowSmsInput(true)}
-                  className="w-full border-dashed"
+                  className="w-full border-dashed transition-all duration-200 ease-out hover:border-primary hover:bg-primary/5"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Phone Number
@@ -299,10 +299,10 @@ export function AlertsPage() {
       </Card>
 
       {/* WhatsApp Notifications */}
-      <Card className="border-border bg-card">
+      <Card className="border-border bg-card transition-all duration-300 ease-out hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-lg bg-primary/10 transition-all duration-200 ease-out group-hover:scale-105">
               <MessageSquare className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
@@ -322,7 +322,7 @@ export function AlertsPage() {
                 {whatsappNotif.contacts.map((contact) => (
                   <div 
                     key={contact.id} 
-                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border"
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border transition-all duration-200 ease-out hover:bg-secondary hover:border-primary/20 group"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium">{contact.value}</span>
@@ -341,7 +341,7 @@ export function AlertsPage() {
                       variant="ghost" 
                       size="sm"
                       onClick={() => removeWhatsapp(contact.id)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive transition-all duration-200 ease-out hover:scale-110 opacity-0 group-hover:opacity-100"
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -369,7 +369,7 @@ export function AlertsPage() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => setShowWhatsappInput(true)}
-                  className="w-full border-dashed"
+                  className="w-full border-dashed transition-all duration-200 ease-out hover:border-primary hover:bg-primary/5"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add WhatsApp Number
