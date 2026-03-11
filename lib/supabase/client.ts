@@ -4,10 +4,11 @@ let client: ReturnType<typeof createSupabaseClient> | null = null
 
 export function createClient() {
   if (client) return client
-  
+
   client = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    // Add the fallback strings here so the build doesn't crash
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key',
     {
       auth: {
         persistSession: true,
@@ -16,6 +17,6 @@ export function createClient() {
       }
     }
   )
-  
+
   return client
 }
