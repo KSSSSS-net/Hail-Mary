@@ -277,32 +277,30 @@ export function InsightsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6">
-              <div className="w-[200px] h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={3}
-                      dataKey="value"
-                      className="transition-all duration-300 ease-out"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.color}
-                          className="transition-all duration-200 ease-out hover:opacity-80"
-                          style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}
-                        />
-                      ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <ChartContainer config={chartConfig} className="w-[200px] h-[200px]">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={3}
+                    dataKey="value"
+                    className="transition-all duration-300 ease-out"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color}
+                        className="transition-all duration-200 ease-out hover:opacity-80"
+                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                </PieChart>
+              </ChartContainer>
               <div className="flex-1 space-y-2">
                 {categoryData.map((category, index) => (
                   <div 
