@@ -27,12 +27,25 @@ function DashboardContent() {
   const router = useRouter()
 
   useEffect(() => {
+    // If we are definitely not loading and there is no user, send to login
     if (!loading && !user) {
       router.push("/auth/login")
     }
   }, [loading, user, router])
 
-  if (loading) {
+  // ADD THIS TIMEOUT SAFETY NET
+  // If it's still loading after 5 seconds, something is wrong with the sync.
+  // We force loading to false so the user can at least see the dashboard frame.
+  const [forceStopLoading, setForceStopLoading] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) setForceStopLoading(true)
+    }, 5000) // 5 second safety net
+    return () => clearTimeout(timer)
+  }, [loading])
+
+  // Modify this line to include the safety net
+  if (loading && !forceStopLoading) {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -43,11 +56,14 @@ function DashboardContent() {
     )
   }
 
-  if (!user) {
+  // If we aren't loading but have no user, show nothing while the redirect happens
+  if (!user && !forceStopLoading) {
     return null
   }
 
   const hasSubscriptions = subscriptions.length > 0
+  
+  // ... rest of your return code remains the same
 
   return (
     <main className="min-h-screen bg-background pb-32">
