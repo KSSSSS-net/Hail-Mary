@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 import { FloatingDock, type TabType } from "@/components/floating-dock"
+import { FloatingBillAlert } from "@/components/floating-bill-alert"
 import { ExpenseCards } from "@/components/expense-cards"
 import { SubscriptionsTable } from "@/components/subscriptions-table"
 import { AlertsPage } from "@/components/alerts-page"
@@ -90,6 +91,8 @@ function DashboardContent() {
           )}
         </div>
       </div>
+
+      <FloatingBillAlert />
 
       <FloatingDock
         activeTab={activeTab}
